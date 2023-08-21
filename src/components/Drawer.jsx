@@ -1,9 +1,8 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { AppContext } from "../App";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const Drawer = ({ slideIn, toggleDrawer }) => {
-  const { notes, setNotes } = useContext(AppContext);
+  const { notes, setNotes, setCurrentTime, playerRef } = useContext(AppContext);
   const drawerStyles = {
     position: "fixed",
     bottom: 0,
@@ -18,54 +17,40 @@ const Drawer = ({ slideIn, toggleDrawer }) => {
     paddingLeft: "10px",
     zIndex: 10,
     transition: `right 0.2s ease-in-out`,
+    maxHeight: "100%",
+    overflowY: "auto",
   };
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
+  const reversedNotes = [...notes].reverse();
 
-    const reorderedNotes = Array.from(notes);
-    const [removed] = reorderedNotes.splice(result.source.index, 1);
-    reorderedNotes.splice(result.destination.index, 0, removed);
-
-    setNotes(reorderedNotes);
+  const formatTimeInSeconds = (timeInMinutes) => {
+    return timeInMinutes * 60;
+  };
+  const handleNoteClick = (timestamp) => {
+    // const timestamp = playerRef.current._reactInternals.actualDuration;
+    // console.log(timestamp);
+    // console.log(playerRef.current.seekTo(timestamp));
+    // console.log(formatTimeInSeconds(timestamp));
   };
   return (
     <div
       style={drawerStyles}
       className="transition-transform duration-200 transform"
     >
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="note-list" type="NOTE">
-          {(provided) => (
-            <div
-              className="flex flex-col gap-6 w-full p-4"
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-            >
-              <div>
-                {notes.map((note, index) => (
-                  <Draggable
-                    key={`note-${note.id}`}
-                    draggableId={`note-${note.id}-${index}`}
-                    index={index}
-                  >
-                    {(provided) => (
-                      <div
-                        className="bg-amber-200 mx-auto mt-6 w-full p-4"
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        ref={provided.innerRef}
-                      >
-                        <p>{note}</p>
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
+      <div className="flex flex-col gap-6 w-full p-4">
+        <div>
+          {reversedNotes.map((note, index) => {
+            return (
+              <div
+                className="bg-amber-200 mx-auto mt-6 w-full p-4 hover:cursor-pointer hover:p-6 transition-all hover:bg-amber-200/60 rounded-br-[14px]"
+                key={index}
+                onClick={(timestamp) => handleNoteClick(timestamp)}
+              >
+                <p>{note}</p>
               </div>
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 };

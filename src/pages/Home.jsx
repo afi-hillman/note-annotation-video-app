@@ -9,7 +9,6 @@ import Drawer from "../components/Drawer";
 const Home = () => {
   const { url, notes, setNotes, showDrawer, setShowDrawer } =
     useContext(AppContext);
-  const playerRef = useRef(null);
   const [currentNote, setCurrentNote] = useState("");
 
   // const saveNoteButtonPress = () => {
